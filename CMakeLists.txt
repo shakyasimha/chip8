@@ -5,9 +5,12 @@ project(CHIP8-Emulator C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# Use pkg-config to find SDL2
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL2 REQUIRED sdl2)
+
 # Include SDL2
-set(SDL2_PATH "$ENV{HOME}/scoop/apps/sdl2/current")
-include_directories("${SDL2_PATH}/include")
+include_directories(${SDL2_INCLUDE_DIRS})
 
 # Source files
 file(GLOB SOURCES "src/*.c")
@@ -16,5 +19,4 @@ file(GLOB SOURCES "src/*.c")
 add_executable(chip8_emu ${SOURCES})
 
 # Link SDL2
-target_link_directories(chip8_emulator PRIVATE "${SDL2_PATH}/lib")
-target_link_directories(chip8_emulator SDL2)
+target_link_libraries(chip8_emu ${SDL2_LIBRARIES})
