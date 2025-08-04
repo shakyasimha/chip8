@@ -1,46 +1,90 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <SDL.h>
 
-// Screen dimension constraints
-const int SCREEN_WIDTH  = 640;
-const int SCREEN_HEIGHT = 480   ;
+#include "SDL.h"
 
-int main(int argc, char **argv) {
-    // Window that we'll be rendering to 
-    SDL_Window* window = NULL; 
+typedef struct {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+} sdl_t;
 
-    // Surface contained by the window 
-    SDL_Surface* screenSurface = NULL;
+typedef struct {
+    uint32_t window_width;  // SDL Window Width
+    uint32_t window_height; // SDL Window Height
+} config_t;
 
-    // Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
-        printf("SLD could not initialize! SDL_ERROR: %s\n", SDL_GetError() );
-    } else {
-        // Create window 
-        window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-        if(window == NULL) {
-            printf("Window could not be created! SDL_ERROR: %s\n", SDL_GetError() ); 
-        } else {
-            // Get window surface 
-            screenSurface = SDL_GetWindowSurface( window );
-
-            // Fill the surface white 
-            SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF) );
-
-            // Update the surface
-            SDL_UpdateWindowSurface( window );
-
-            // Hack to get the window to stay up 
-            SDL_Event e; bool quit = false; while( quit == false ) { while( SDL_PollEvent( &e )) { if ( e.type == SDL_QUIT) quit = true; }}
-        }
+// Initializing SDL
+bool init_sdl(sdl_t* sdl, const config_t config) {
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
+        SDL_Log("Failed to initialize SDL subsystem! %s\n", SDL_GetError());
+        return false; 
     }
 
-    // Destroy window 
-    SDL_DestroyWindow( window );
+    sdl->window = SDL_CreateWindow("CHIP8 Emulator", SDL_WINDOWPOS_CENTERED, 
+                                SDL_WINDOWPOS_CENTERED, 
+                                config.window_width, config.window_height, 
+                                0);
 
-    // Quit SDL subsystems
-    SDL_Quit();
+    if(!sdl->window) {
+        SDL_Log("Failed to create SDL window! %s\n", SDL_GetError());
+        return false;
+    }
 
-    return 0;
+    sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED);
+    if(!sdl->renderer) {
+        SDL_Log("Failed to render SDL subsystem. %s\n", SDL_GetError());
+        return false;
+    }
+
+    return true; // Success
+}
+
+// Setup initial emulator configuration from passed down arguments
+bool set_config_from_args(config_t *config, int argc, const char **argv) {
+    // Set defaults 
+    *config = (config_t){
+        .window_width = 640,
+        .window_height = 320,
+    };
+
+    // Override defualts passed in the arguments
+    for(int i = 1; i < argc; i++){
+        (void)argv[i];  // prevent compiler error form unused argc/arg
+        //...
+    }
+}
+
+// Final cleanup
+void final_cleanup(const sdl_t *sdl) {
+    if(sdl->renderer) SDL_DestroyRenderer(sdl->renderer);
+    if(sdl->window) SDL_DestroyWindow(sdl->window);
+    SDL_Quit(); // Shuts down the SDL subsystem
+}
+
+int main(int argc, char **argv) {
+    (void)argc; 
+    (void)argv;
+    
+    // Initialize SDL values
+    sdl_t sdl = {0};
+    config_t config = {0};
+
+    // Initialize sdl config options
+    if (!set_config_from_args(&config, argc, argv)) exit(EXIT_FAILURE);
+
+    // Finally initialize sdl
+    if(!init_sdl(&sdl, config)) exit(EXIT_FAILURE);
+    
+    // Initial screen clear
+    SDL_RenderClear(sdl.renderer);
+
+    // Main emulator loop
+    while(true) {
+        
+    }
+
+    // Final cleanup
+    final_cleanup(&sdl);
+
+    exit(EXIT_SUCCESS);
 }
