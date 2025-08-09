@@ -21,5 +21,6 @@ typedef struct CPU_Chip8 {
 
 // Function for initializing components of CHIP8 CPU
 cpu_t* init_cpu(const cpu_t *cpu);
+void free_cpu(const cpu_t *cpu);
 
 #endif
