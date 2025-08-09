@@ -11,6 +11,8 @@ typedef struct {
 typedef struct {
     uint32_t window_width;  // SDL Window Width
     uint32_t window_height; // SDL Window Height
+    uint32_t fg_color;      // Foreground colour
+    uint32_t bg_color;      // Background colour 
 } config_t;
 
 // Initializing SDL
@@ -45,6 +47,8 @@ bool set_config_from_args(config_t *config, int argc, const char **argv) {
     *config = (config_t){
         .window_width = 640,
         .window_height = 320,
+        .fg_color = 0xFFFFFF,
+        .bg_color = 0x000000
     };
 
     // Override defualts passed in the arguments
@@ -54,10 +58,26 @@ bool set_config_from_args(config_t *config, int argc, const char **argv) {
     }
 }
 
+// Clear screen / SDL window to background colour
+void clear_screen(const sdl_t sdl, const config_t config) {
+    const uint8_t r = (config.bg_color >> 24) && 0xFF;
+    const uint8_t g = (config.bg_color >> 16) && 0xFF;
+    const uint8_t b = (config.bg_color >> 8) && 0xFF;
+    const uint8_t a = (config.bg_color >> 0) && 0xFF;
+
+    SDL_SetRenderDrawColor(sdl.renderer, r, g, b, a);
+    SDL_RenderClear(sdl.renderer);
+}
+
+// Updating screen
+void update_screen(const config_t config) {
+    SDL_RenderPresent();
+}
+
 // Final cleanup
-void final_cleanup(const sdl_t *sdl) {
-    if(sdl->renderer) SDL_DestroyRenderer(sdl->renderer);
-    if(sdl->window) SDL_DestroyWindow(sdl->window);
+void final_cleanup(const sdl_t sdl) {
+    if(sdl.renderer) SDL_DestroyRenderer(sdl.renderer);
+    if(sdl.window) SDL_DestroyWindow(sdl.window);
     SDL_Quit(); // Shuts down the SDL subsystem
 }
 
@@ -76,11 +96,14 @@ int main(int argc, char **argv) {
     if(!init_sdl(&sdl, config)) exit(EXIT_FAILURE);
     
     // Initial screen clear
-    SDL_RenderClear(sdl.renderer);
+    clear_screen(sdl, config);
 
     // Main emulator loop
     while(true) {
-        
+        SDL_Delay();
+
+        // Update window with changes
+        update_screen(sdl, config);
     }
 
     // Final cleanup
