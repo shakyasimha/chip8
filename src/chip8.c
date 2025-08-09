@@ -2,8 +2,22 @@
 
 #include "chip8.h"
 
-void init_cpu(cpu_t *cpu) {
-    *cpu = (cpu_t) {
-                
-    }
+cpu_t* init_cpu(cpu_t *cpu) {
+    // Allocating memory for CPU
+    cpu_t *cpu = malloc(sizeof(cpu_t)); 
+
+    // Return null if it cannot allocate CPU
+    if (!cpu) return NULL;
+
+    // Clearing registers and memory
+    memset(cpu->V, 0, sizeof(cpu->V));
+    cpu->I = 0;
+    cpu->PC = 0; 
+    memset(cpu->STACK, 0, sizeof(cpu->STACK));
+    cpu->SP = 0;
+    cpu->DELAY_TIMER = 0;
+    cpu->SOUND_TIMER = 0;
+    memset(cpu->MEMORY, 0, sizeof(cpu->MEMORY));
+
+    return cpu;
 }
