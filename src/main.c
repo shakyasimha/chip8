@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 #include "SDL.h"
-#include "chip8.h"
+// #include "chip8.h"
 
 // SDL Container Object
 typedef struct {
@@ -29,6 +29,7 @@ typedef enum {
 // CHIP8 machine state
 typedef struct {
     emulator_state_t state;
+    // cpu_t *cpu; 
 } chip8_t;
 
 // Initializing SDL
@@ -58,8 +59,10 @@ bool init_sdl(sdl_t* sdl, const config_t config) {
 }
 
 // Initializing CHIP8 configuration
-void init_chip8(const chip8_t *chip8) {
+bool init_chip8(const chip8_t *chip8) {
+    chip8->state = RUNNING; // Default state of chip8
 
+    return true;
 }
 
 // Setup initial emulator configuration from passed down arguments

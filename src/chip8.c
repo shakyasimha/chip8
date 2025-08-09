@@ -3,7 +3,7 @@
 
 #include "chip8.h"
 
-cpu_t* init_cpu(cpu_t *cpu) {
+void init_cpu(cpu_t *cpu) {
     // Allocating memory for CPU
     cpu_t *cpu = malloc(sizeof(cpu_t)); 
 
@@ -20,7 +20,7 @@ cpu_t* init_cpu(cpu_t *cpu) {
     cpu->SOUND_TIMER = 0;
     memset(cpu->MEMORY, 0, sizeof(cpu->MEMORY));
 
-    return cpu;
+    // return cpu;
 }
 
 void free_cpu(cpu_t *cpu) {

@@ -10,7 +10,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 
 # Include SDL2
-include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(${SDL2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 
 # Source files
 file(GLOB SOURCES "src/*.c")
